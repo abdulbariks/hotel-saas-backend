@@ -1,118 +1,529 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Hotel SaaS Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A multi-tenant hotel management SaaS platform built with [NestJS](https://nestjs.com/), PostgreSQL, and Prisma.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Tech Stack
 
-## Description
+- **Framework**: NestJS 12 (Node.js, TypeScript)
+- **Database**: PostgreSQL with Prisma ORM
+- **Authentication**: JWT with Passport, Argon2/bcrypt password hashing
+- **Validation**: class-validator & class-transformer
+- **Observability**: NestJS Observe (distributed tracing, metrics, logging)
+- **Testing**: Vitest (unit, e2e, coverage)
+- **Linting**: Oxlint with TypeScript support
+- **Formatting**: Prettier
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
+## Project Setup
 
 ```bash
-$ pnpm install
+# Install dependencies
+pnpm install
+
+# Generate Prisma client
+pnpm prisma generate
+
+# Run database migrations
+pnpm prisma migrate dev
 ```
 
-## Compile and run the project
+## Environment Variables
 
-```bash
-# development
-$ pnpm run start
+Create a `.env` file in the root directory:
 
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/hotel_saas?schema=public"
+JWT_SECRET="your-super-secret-jwt-key"
+JWT_EXPIRES_IN="1d"
+PORT=5000
+NODE_ENV=development
 ```
 
-## Run tests
+## Compile and Run
 
 ```bash
-# unit tests
-$ pnpm run test
+# Development (watch mode)
+pnpm run start:dev
 
-# e2e tests
-$ pnpm run test:e2e
+# Production build
+pnpm run build
+pnpm run start:prod
+```
 
-# test coverage
-$ pnpm run test:cov
+The API will be available at `http://localhost:5000/api/v1`
+
+## Database Commands
+
+```bash
+# Open Prisma Studio
+pnpm prisma studio
+
+# Create a new migration
+pnpm prisma migrate dev --name migration_name
+
+# Deploy migrations to production
+pnpm prisma migrate deploy
+
+# Reset database (development only)
+pnpm prisma migrate reset
+```
+
+## Run Tests
+
+```bash
+# Unit tests
+pnpm run test
+
+# Watch mode
+pnpm run test:watch
+
+# E2E tests
+pnpm run test:e2e
+
+# Test coverage
+pnpm run test:cov
+```
+
+## Linting & Formatting
+
+```bash
+# Lint
+pnpm run lint
+
+# Format
+pnpm run format
 ```
 
 ## Deployment
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Using NestJS Mau (AWS)
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+pnpm install -g @nestjs/mau
+pnpm run deploy
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Docker
+
+```bash
+docker build -t hotel-saas-backend .
+docker run -p 5000:5000 --env-file .env hotel-saas-backend
+```
+
+## API Documentation
+
+The API uses global prefix `/api/v1`. All endpoints are versioned under this prefix.
 
 ## Observability
 
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
+This project is instrumented with [NestJS Observe](https://observe.nestjs.com). To enable:
 
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
+1. Create a free account at [observe.nestjs.com](https://observe.nestjs.com)
+2. Add an application
+3. Add the generated app key and secret to `ObserveModule.forRoot()` in `src/app.module.ts`
 
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
+## Project Structure
 
-This project is already instrumented. Create a free account at [observe.nestjs.com](https://observe.nestjs.com), add an application, and paste the generated app key and secret into the `ObserveModule.forRoot()` call in `src/app.module.ts`.
+```
+src/
+├── app.module.ts          # Root module
+├── main.ts                # Application entry point
+├── common/                # Shared utilities, guards, pipes, decorators
+├── config/                # Configuration modules
+├── modules/               # Feature modules
+│   ├── auth/              # Authentication & authorization
+│   ├── hotels/            # Hotel management
+│   ├── rooms/             # Room management
+│   ├── bookings/          # Booking system
+│   └── tenants/           # Multi-tenancy
+└── prisma/                # Prisma service & extensions
+```
 
-The free plan needs no payment details and covers 300,000 events a month. You can also browse the [live demo](https://www.observe-demo.nestjs.com/dashboard) first - the whole dashboard over a busy service's data, with nothing to install.
+## API Routes
 
-## Resources
+All routes are prefixed with `/api/v1`.
 
-Check out a few resources that may come in handy when working with NestJS:
+### Authentication
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observe](https://observe.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/auth/register` | Register new user | No |
+| POST | `/auth/login` | Login and get JWT token | No |
 
-## Support
+#### Register User
+```bash
+curl -X POST http://localhost:5000/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "owner@hotel.com",
+    "password": "password123"
+  }'
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+**Response:**
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "uuid",
+    "email": "owner@hotel.com",
+    "createdAt": "2024-01-15T10:30:00.000Z"
+  }
+}
+```
 
-## Stay in touch
+#### Login
+```bash
+curl -X POST http://localhost:5000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "owner@hotel.com",
+    "password": "password123"
+  }'
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+**Response:** Same as register.
+
+---
+
+### Tenants (Hotels)
+
+All tenant routes require JWT authentication.
+
+| Method | Endpoint | Description | Auth | Roles |
+|--------|----------|-------------|------|-------|
+| POST | `/tenants` | Create tenant (hotel) | Yes | Any |
+| GET | `/tenants` | List user's tenants | Yes | Any |
+| GET | `/tenants/current` | Get current tenant context | Yes | Any |
+
+#### Create Tenant
+```bash
+curl -X POST http://localhost:5000/api/v1/tenants \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{
+    "name": "Grand Hotel",
+    "slug": "grand-hotel"
+  }'
+```
+
+**Response:**
+```json
+{
+  "id": "uuid",
+  "name": "Grand Hotel",
+  "slug": "grand-hotel",
+  "createdAt": "2024-01-15T10:30:00.000Z"
+}
+```
+
+#### List Tenants
+```bash
+curl -X GET http://localhost:5000/api/v1/tenants \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+#### Get Current Tenant (requires tenant context header)
+```bash
+curl -X GET http://localhost:5000/api/v1/tenants/current \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "x-tenant-id: TENANT_UUID"
+```
+
+---
+
+### Rooms
+
+All room routes require JWT authentication and tenant context (`x-tenant-id` header).
+
+| Method | Endpoint | Description | Auth | Roles |
+|--------|----------|-------------|------|-------|
+| GET | `/rooms` | List all rooms | Yes | Any |
+| GET | `/rooms/:id` | Get room by ID | Yes | Any |
+| POST | `/rooms` | Create room | Yes | OWNER, ADMIN |
+| PATCH | `/rooms/:id` | Update room | Yes | OWNER, ADMIN |
+| DELETE | `/rooms/:id` | Delete room | Yes | OWNER, ADMIN |
+
+#### List Rooms
+```bash
+curl -X GET http://localhost:5000/api/v1/rooms \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "x-tenant-id: TENANT_UUID"
+```
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "name": "Deluxe Suite",
+    "type": "SUITE",
+    "price": "299.99",
+    "capacity": 2,
+    "isActive": true,
+    "createdAt": "2024-01-15T10:30:00.000Z"
+  }
+]
+```
+
+#### Create Room
+```bash
+curl -X POST http://localhost:5000/api/v1/rooms \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "x-tenant-id: TENANT_UUID" \
+  -d '{
+    "name": "Deluxe Suite",
+    "type": "SUITE",
+    "price": 299.99,
+    "capacity": 2
+  }'
+```
+
+#### Get Room
+```bash
+curl -X GET http://localhost:5000/api/v1/rooms/ROOM_UUID \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "x-tenant-id: TENANT_UUID"
+```
+
+#### Update Room
+```bash
+curl -X PATCH http://localhost:5000/api/v1/rooms/ROOM_UUID \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "x-tenant-id: TENANT_UUID" \
+  -d '{
+    "price": 349.99,
+    "isActive": true
+  }'
+```
+
+#### Delete Room
+```bash
+curl -X DELETE http://localhost:5000/api/v1/rooms/ROOM_UUID \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "x-tenant-id: TENANT_UUID"
+```
+
+---
+
+### Bookings
+
+All booking routes require JWT authentication and tenant context (`x-tenant-id` header).
+
+| Method | Endpoint | Description | Auth | Roles |
+|--------|----------|-------------|------|-------|
+| POST | `/bookings` | Create booking | Yes | Any |
+| GET | `/bookings` | List all bookings | Yes | Any |
+| GET | `/bookings/:id` | Get booking by ID | Yes | Any |
+| PATCH | `/bookings/:id/cancel` | Cancel booking | Yes | Any |
+
+#### Create Booking
+```bash
+curl -X POST http://localhost:5000/api/v1/bookings \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "x-tenant-id: TENANT_UUID" \
+  -d '{
+    "roomId": "ROOM_UUID",
+    "guestName": "John Doe",
+    "guestEmail": "john@example.com",
+    "checkIn": "2024-02-15",
+    "checkOut": "2024-02-18",
+    "guests": 2
+  }'
+```
+
+**Response:**
+```json
+{
+  "id": "uuid",
+  "tenantId": "uuid",
+  "roomId": "uuid",
+  "userId": "uuid",
+  "guestName": "John Doe",
+  "guestEmail": "john@example.com",
+  "checkIn": "2024-02-15T00:00:00.000Z",
+  "checkOut": "2024-02-18T00:00:00.000Z",
+  "guests": 2,
+  "total": "899.97",
+  "status": "CONFIRMED",
+  "createdAt": "2024-01-15T10:30:00.000Z"
+}
+```
+
+#### List Bookings
+```bash
+curl -X GET http://localhost:5000/api/v1/bookings \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "x-tenant-id: TENANT_UUID"
+```
+
+#### Get Booking
+```bash
+curl -X GET http://localhost:5000/api/v1/bookings/BOOKING_UUID \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "x-tenant-id: TENANT_UUID"
+```
+
+#### Cancel Booking
+```bash
+curl -X PATCH http://localhost:5000/api/v1/bookings/BOOKING_UUID/cancel \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "x-tenant-id: TENANT_UUID"
+```
+
+---
+
+## Demo Data & Token Flow
+
+### Quick Start Script
+
+```bash
+#!/bin/bash
+# Save as demo.sh and run: chmod +x demo.sh && ./demo.sh
+
+BASE_URL="http://localhost:5000/api/v1"
+
+echo "=== 1. Register User ==="
+REGISTER_RESPONSE=$(curl -s -X POST "$BASE_URL/auth/register" \
+  -H "Content-Type: application/json" \
+  -d '{"email": "demo@hotel.com", "password": "demo123456"}')
+echo "$REGISTER_RESPONSE"
+
+TOKEN=$(echo "$REGISTER_RESPONSE" | jq -r '.access_token')
+echo "Token: $TOKEN"
+
+echo -e "\n=== 2. Create Tenant ==="
+TENANT_RESPONSE=$(curl -s -X POST "$BASE_URL/tenants" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"name": "Demo Hotel", "slug": "demo-hotel"}')
+echo "$TENANT_RESPONSE"
+
+TENANT_ID=$(echo "$TENANT_RESPONSE" | jq -r '.id')
+echo "Tenant ID: $TENANT_ID"
+
+echo -e "\n=== 3. Create Rooms ==="
+ROOM1=$(curl -s -X POST "$BASE_URL/rooms" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "x-tenant-id: $TENANT_ID" \
+  -d '{"name": "Standard Room", "type": "STANDARD", "price": 149.99, "capacity": 2}')
+echo "Room 1: $ROOM1"
+
+ROOM2=$(curl -s -X POST "$BASE_URL/rooms" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "x-tenant-id: $TENANT_ID" \
+  -d '{"name": "Deluxe Suite", "type": "SUITE", "price": 299.99, "capacity": 4}')
+echo "Room 2: $ROOM2"
+
+ROOM_ID=$(echo "$ROOM1" | jq -r '.id')
+echo "Room ID: $ROOM_ID"
+
+echo -e "\n=== 4. List Rooms ==="
+curl -s -X GET "$BASE_URL/rooms" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "x-tenant-id: $TENANT_ID" | jq
+
+echo -e "\n=== 5. Create Booking ==="
+BOOKING=$(curl -s -X POST "$BASE_URL/bookings" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "x-tenant-id: $TENANT_ID" \
+  -d '{
+    "roomId": "'$ROOM_ID'",
+    "guestName": "Jane Smith",
+    "guestEmail": "jane@example.com",
+    "checkIn": "2024-03-10",
+    "checkOut": "2024-03-12",
+    "guests": 2
+  }')
+echo "$BOOKING"
+
+echo -e "\n=== 6. List Bookings ==="
+curl -s -X GET "$BASE_URL/bookings" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "x-tenant-id: $TENANT_ID" | jq
+
+echo -e "\n=== Demo Complete ==="
+echo "Use this token for authenticated requests:"
+echo "$TOKEN"
+echo "Use this tenant ID for x-tenant-id header:"
+echo "$TENANT_ID"
+```
+
+### Sample JWT Token Structure
+
+The JWT payload contains:
+```json
+{
+  "sub": "USER_UUID",
+  "iat": 1705315200,
+  "exp": 1705401600
+}
+```
+
+The `AuthenticatedRequest` extends Express Request with:
+```typescript
+{
+  user: {
+    sub: "USER_UUID",      // User ID
+    tenantId: "TENANT_UUID", // Current tenant context
+    role: "OWNER"          // MembershipRole: OWNER | ADMIN | RECEPTIONIST
+  }
+}
+```
+
+### Role-Based Access
+
+| Role | Tenants | Rooms (Read) | Rooms (Write) | Bookings |
+|------|---------|--------------|---------------|----------|
+| OWNER | Full CRUD | Yes | Yes | Full |
+| ADMIN | Read | Yes | Yes | Full |
+| RECEPTIONIST | Read | Yes | No | Full |
+
+### Error Responses
+
+**401 Unauthorized:**
+```json
+{
+  "statusCode": 401,
+  "message": "Unauthorized",
+  "error": "Unauthorized"
+}
+```
+
+**403 Forbidden (insufficient role):**
+```json
+{
+  "statusCode": 403,
+  "message": "Forbidden resource",
+  "error": "Forbidden"
+}
+```
+
+**400 Bad Request (validation):**
+```json
+{
+  "statusCode": 400,
+  "message": ["email must be an email", "password must be longer than or equal to 8 characters"],
+  "error": "Bad Request"
+}
+```
+
+**404 Not Found:**
+```json
+{
+  "statusCode": 404,
+  "message": "Room not found",
+  "error": "Not Found"
+}
+```
+
+---
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+UNLICENSED - Private project
