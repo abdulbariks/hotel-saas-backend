@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum MembershipRole {
+  OWNER
+  ADMIN
+  RECEPTIONIST
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+model Tenant {
+  id          String       @id @default(uuid()) @db.Uuid
+  name        String
+  slug        String       @unique
+  memberships Membership[]
+  rooms       Room[]
+  bookings    Booking[]
+  createdAt   DateTime     @default(now())
+
+  @@map("tenants")
+}
+
+model User {
+  id          String       @id @default(uuid()) @db.Uuid
+  email       String       @unique
+  password    String
+  memberships Membership[]
+  bookings    Booking[]
+  createdAt   DateTime     @default(now())
+
+  @@map("users")
+}
+
+model Membership {
+  id       String         @id @default(uuid()) @db.Uuid
+  tenantId String         @db.Uuid
+  userId   String         @db.Uuid
+  role     MembershipRole @default(RECEPTIONIST)
+  tenant   Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId])
+  @@index([userId])
+  @@map("memberships")
+}
+
+model Room {
+  id        String    @id @default(uuid()) @db.Uuid
+  tenantId  String    @db.Uuid
+  name      String
+  type      String
+  price     Decimal   @db.Decimal(10, 2)
+  capacity  Int       @default(2)
+  isActive  Boolean   @default(true)
+  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  bookings  Booking[]
+  createdAt DateTime  @default(now())
+
+  @@unique([tenantId, name])
+  @@index([tenantId, isActive])
+  @@map("rooms")
+}
+
+model Booking {
+  id         String        @id @default(uuid()) @db.Uuid
+  tenantId   String        @db.Uuid
+  roomId     String        @db.Uuid
+  userId     String?       @db.Uuid
+  guestName  String
+  guestEmail String
+  checkIn    DateTime      @db.Date
+  checkOut   DateTime      @db.Date
+  guests     Int           @default(1)
+  total      Decimal       @db.Decimal(10, 2)
+  status     BookingStatus @default(CONFIRMED)
+  tenant     Tenant        @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  room       Room          @relation(fields: [roomId], references: [id], onDelete: Restrict)
+  user       User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt  DateTime      @default(now())
+
+  @@index([tenantId, checkIn, checkOut])
+  @@index([roomId, status, checkIn, checkOut])
+  @@map("bookings")
+}

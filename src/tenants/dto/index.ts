@@ -1,0 +1,1 @@
+export { CreateTenantDto } from "./tenant.dto.js";

@@ -1,0 +1,1 @@
+export { CreateRoomDto, UpdateRoomDto } from "./room.dto.js";
