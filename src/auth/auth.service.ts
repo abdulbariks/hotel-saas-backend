@@ -11,6 +11,11 @@ import { LoginDto, RegisterDto } from "./dto/index.js";
 
 export interface AuthTokens {
   access_token: string;
+  user: {
+    id: string;
+    email: string;
+    createdAt: Date;
+  };
 }
 
 @Injectable()
@@ -46,7 +51,7 @@ export class AuthService {
       },
     });
 
-    return this.generateTokens(user.id);
+    return this.generateTokens(user);
   }
 
   async login(data: LoginDto): Promise<AuthTokens> {
@@ -67,17 +72,24 @@ export class AuthService {
       throw new UnauthorizedException("Invalid credentials");
     }
 
-    return this.generateTokens(user.id);
+    return this.generateTokens(user);
   }
 
-  private generateTokens(userId: string): AuthTokens {
+  private generateTokens(user: { id: string; email: string; createdAt: Date }): AuthTokens {
     const access_token = this.jwtService.sign(
-      { sub: userId },
+      { sub: user.id },
       {
         expiresIn: "7d",
       },
     );
 
-    return { access_token };
+    return {
+      access_token,
+      user: {
+        id: user.id,
+        email: user.email,
+        createdAt: user.createdAt,
+      },
+    };
   }
 }

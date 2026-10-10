@@ -15,10 +15,10 @@ export interface BookingResponse {
   userId: string | null;
   guestName: string;
   guestEmail: string;
-  checkIn: Date;
-  checkOut: Date;
+  checkIn: string;
+  checkOut: string;
   guests: number;
-  total: number;
+  total: string;
   status: BookingStatus;
   createdAt: Date;
   room?: Room;
@@ -32,10 +32,10 @@ function toResponse(booking: Booking & { room?: Room }): BookingResponse {
     userId: booking.userId,
     guestName: booking.guestName,
     guestEmail: booking.guestEmail,
-    checkIn: booking.checkIn,
-    checkOut: booking.checkOut,
+    checkIn: booking.checkIn.toISOString(),
+    checkOut: booking.checkOut.toISOString(),
     guests: booking.guests,
-    total: Number(booking.total),
+    total: booking.total.toString(),
     status: booking.status,
     createdAt: booking.createdAt,
     room: booking.room,

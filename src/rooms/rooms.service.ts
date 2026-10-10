@@ -12,7 +12,7 @@ export interface RoomResponse {
   tenantId: string;
   name: string;
   type: string;
-  price: number;
+  price: string;
   capacity: number;
   isActive: boolean;
   createdAt: Date;
@@ -24,7 +24,7 @@ function toResponse(room: Room): RoomResponse {
     tenantId: room.tenantId,
     name: room.name,
     type: room.type,
-    price: Number(room.price),
+    price: room.price.toString(),
     capacity: room.capacity,
     isActive: room.isActive,
     createdAt: room.createdAt,

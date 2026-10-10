@@ -12,11 +12,6 @@ import type {
   MembershipRole,
 } from "../generated/prisma/client.js";
 
-export interface TenantWithMembership {
-  tenant: Tenant;
-  membership: Membership;
-}
-
 @Injectable()
 export class TenantsService {
   constructor(private readonly prisma: PrismaService) {}
@@ -24,7 +19,7 @@ export class TenantsService {
   async create(
     userId: string,
     data: CreateTenantDto,
-  ): Promise<TenantWithMembership> {
+  ): Promise<Tenant> {
     const existingSlug = await this.prisma.tenant.findUnique({
       where: { slug: data.slug },
     });
@@ -41,7 +36,7 @@ export class TenantsService {
         },
       });
 
-      const membership = await tx.membership.create({
+      await tx.membership.create({
         data: {
           tenantId: tenant.id,
           userId,
@@ -49,7 +44,7 @@ export class TenantsService {
         },
       });
 
-      return { tenant, membership };
+      return tenant;
     });
   }
 
@@ -62,7 +57,7 @@ export class TenantsService {
     return memberships.map((m) => m.tenant).filter((t): t is Tenant => t != null);
   }
 
-  async getCurrentForUser(userId: string): Promise<TenantWithMembership> {
+  async getCurrentForUser(userId: string): Promise<Tenant> {
     const membership = await this.prisma.membership.findFirst({
       where: { userId },
       include: { tenant: true },
@@ -72,10 +67,7 @@ export class TenantsService {
       throw new NotFoundException("No tenant found for user");
     }
 
-    return {
-      tenant: membership.tenant,
-      membership,
-    };
+    return membership.tenant;
   }
 
   async getTenant(tenantId: string): Promise<Tenant> {
