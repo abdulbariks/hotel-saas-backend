@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from "@nestjs/common";
@@ -21,7 +22,13 @@ export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
   @Get()
-  findAll(@Req() req: AuthenticatedRequest) {
+  findAll(
+    @Req() req: AuthenticatedRequest,
+    @Query("includeInactive") includeInactive?: string,
+  ) {
+    if (includeInactive === "true") {
+      return this.roomsService.findAllIncludingInactive(req.user.tenantId);
+    }
     return this.roomsService.findAll(req.user.tenantId);
   }
 

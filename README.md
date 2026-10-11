@@ -148,6 +148,7 @@ All routes are prefixed with `/api/v1`.
 |--------|----------|-------------|------|
 | POST | `/auth/register` | Register new user | No |
 | POST | `/auth/login` | Login and get JWT token | No |
+| GET | `/auth/me` | Get current authenticated user | Yes |
 
 #### Register User
 ```bash

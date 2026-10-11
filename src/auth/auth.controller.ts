@@ -1,6 +1,15 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  UseGuards,
+} from "@nestjs/common";
+import type { Request } from "express";
 import { AuthService } from "./auth.service.js";
 import { LoginDto, RegisterDto } from "./dto/index.js";
+import { JwtAuthToken } from "./jwt-auth.guard.js";
 
 @Controller("auth")
 export class AuthController {
@@ -14,5 +23,12 @@ export class AuthController {
   @Post("login")
   login(@Body() body: LoginDto) {
     return this.svc.login(body);
+  }
+
+  @Get("me")
+  @UseGuards(JwtAuthToken)
+  me(@Req() req: Request) {
+    const user = (req as unknown as { user: { id: string } }).user;
+    return this.svc.getMe(user.id);
   }
 }

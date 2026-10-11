@@ -75,6 +75,24 @@ export class AuthService {
     return this.generateTokens(user);
   }
 
+  async getMe(
+    userId: string,
+  ): Promise<AuthTokens["user"]> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException("Invalid token");
+    }
+
+    return {
+      id: user.id,
+      email: user.email,
+      createdAt: user.createdAt,
+    };
+  }
+
   private generateTokens(user: { id: string; email: string; createdAt: Date }): AuthTokens {
     const access_token = this.jwtService.sign(
       { sub: user.id },
